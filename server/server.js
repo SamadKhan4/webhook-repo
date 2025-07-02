@@ -30,6 +30,14 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
+// ✅ GitHub Webhook Route
+app.post('/webhook', (req, res) => {
+  console.log('📬 GitHub webhook received');
+  console.log('📦 Event Type:', req.headers['x-github-event']);
+  console.log('🧾 Payload:', JSON.stringify(req.body, null, 2));
+  res.status(200).send('✅ Webhook received');
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/bills', billRoutes);
@@ -44,15 +52,7 @@ app.use('/api/items', itemRoutes);
 app.use('/api/return-exchange', returnExchangeRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Webhook Route (GitHub Webhook Receiver)
-app.post('/webhook', (req, res) => {
-  console.log('📬 GitHub webhook received');
-  console.log('📦 Event Type:', req.headers['x-github-event']);
-  console.log('🧾 Payload:', JSON.stringify(req.body, null, 2));
-  res.status(200).send('✅ Webhook received');
-});
-
-// MongoDB Connection & Server Start
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
