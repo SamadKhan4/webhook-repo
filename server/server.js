@@ -14,8 +14,8 @@ import itemRoutes from './routes/itemRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
 import agentRoutes from './routes/agentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import employeeRoutes from './routes/employeeRoutes.js'; // ✅ Added
-import returnExchangeRoutes from './routes/returnExchange.js'; // added here
+import employeeRoutes from './routes/employeeRoutes.js';
+import returnExchangeRoutes from './routes/returnExchange.js';
 
 // Import Utility
 import createAdminIfNotExists from './config/createAdmin.js';
@@ -25,7 +25,6 @@ dotenv.config();
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 // Middleware
 app.use(cors());
@@ -40,16 +39,20 @@ app.use('/vendors', vendorRoutes);
 app.use('/agents', agentRoutes);
 app.use('/admin', adminRoutes);
 app.use('/users', userRoutes);
-app.use('/employees', employeeRoutes); // ✅ Registered here
+app.use('/employees', employeeRoutes);
 app.use('/api/items', itemRoutes);
-app.use('/api/return-exchange', returnExchangeRoutes); // new here
+app.use('/api/return-exchange', returnExchangeRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// ✅ Webhook Route (GitHub Webhook Receiver)
+app.post('/webhook', (req, res) => {
+  console.log('📬 GitHub webhook received');
+  console.log('📦 Event Type:', req.headers['x-github-event']);
+  console.log('🧾 Payload:', JSON.stringify(req.body, null, 2));
+  res.status(200).send('✅ Webhook received');
+});
 
-
-
-
-// MongoDB Connection
+// MongoDB Connection & Server Start
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
